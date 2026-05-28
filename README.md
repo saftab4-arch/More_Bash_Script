@@ -1,33 +1,4 @@
 
-
-Skip to content
-Using Western Governors University Mail with screen readers
-
-2 of 6,302
-(no subject)
-External
-Inbox
-
-Syed Aftab via wgu.edu 
-Attachments
-9:56 PM (15 minutes ago)
-to me
-
-
-
---
-Syed Basit Aftab
-Computer Technology Specialist
-South River Public Schools
-📍 South River, NJ
-📧 saftab@srivernj.org
-🌐 https://url.us.m.mimecastprotect.com/s/ou4yCL91x8cVDy22RcBfkUy3jlR?domain=srivernj.org
-
-
-
-This e-mail is a private communication, intended only for the use of the named recipient(s), and may contain information or attachments that are confidential or privileged. If you are not the intended recipient, you are hereby notified that any disclosure, copying, distribution or use of the contents of this message is strictly prohibited. If you have received this message in error, or are not the named recipient, please notify us immediately by contacting the sender at the e- mail address noted above and delete and destroy all copies of this message. 
- 2 Attachments
-  •  Scanned by Gmail
 # 🐚 Bash Scripting Journey
 > From zero to real scripts — 20 hands-on Bash scripts with explanations, outputs, and lessons learned.
 
