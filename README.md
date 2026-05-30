@@ -1,6 +1,6 @@
 
 # 🐚 Bash Scripting Journey
-> From zero to real scripts — 20 hands-on Bash scripts with explanations, outputs, and lessons learned.
+> From zero to real scripts — hands-on Bash scripts with explanations, outputs, and lessons learned.
 
 ---
 
