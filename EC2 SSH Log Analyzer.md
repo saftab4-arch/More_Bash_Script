@@ -282,18 +282,6 @@ Evaluates user input and executes the matching option.
 
 ---
 
-# Screenshots
-
-## EC2 Security Log Analyzer Menu
-
-![Menu](Screenshots/08-ec2-log-analyzer-working.png)
-
-## Real SSH Logs Retrieved From systemd Journal
-
-![Logs](Screenshots/07-ec2-journalctl-logs.png)
-
----
-
 # Troubleshooting
 
 ## Issue #1 - Missing Log File
