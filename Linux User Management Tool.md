@@ -1,170 +1,195 @@
-User Management Tool
-A Bash-based Linux administration utility that automates common user management tasks through an interactive menu-driven interface.
+# 🐧 User Management Tool
 
-This project was created to practice Linux administration, Bash scripting, functions, conditionals, logging, and automation.
+A Bash-based Linux administration utility that automates common user management tasks through an interactive, menu-driven interface.
 
-Project Overview
-The User Management Tool allows administrators to:
+Built as part of my **Linux / DevOps / AWS learning journey** to practice Bash scripting, functions, conditional logic, logging, and the automation of repetitive system administration tasks.
 
-Create users
 
-Delete users
+## 📋 Overview
 
-Check if a user exists
+The User Management Tool wraps common Linux user-administration commands into a single, easy-to-use interactive menu. Instead of remembering and typing each command individually, an administrator can drive everything from one script.
 
-Lock user accounts
+Supported actions:
 
-Unlock user accounts
+- Create users
+- Delete users
+- Check if a user exists
+- Lock user accounts
+- Unlock user accounts
+- Reset passwords
+- View user information
+- Log every administrative action to an audit file
 
-Reset passwords
+---
 
-View user information
+## ✅ Prerequisites
 
-Log all administrative actions
+Most of the commands used here (`useradd`, `userdel`, `passwd`) modify the system account database and **require root privileges**. Run the script with `sudo` or as the root user:
 
-The tool uses common Linux administration commands and wraps them into a simple interactive menu.
+```bash
+sudo ./user_management.sh
+```
 
-Technologies Used
-Bash
+You'll also need a Linux environment (a VM, a Docker Ubuntu container, Killercoda, or a cloud instance all work).
 
-Linux User Administration
+---
 
-Functions
+## 🚀 Installation & Usage
 
-Variables
+```bash
+# 1. Clone the repository
+git clone https://github.com/saftab4-arch/user-management-tool.git
+cd user-management-tool
 
-If/Else Statements
+# 2. Make the script executable
+chmod +x user_management.sh
 
-Case Statements
+# 3. Run it (root required)
+sudo ./user_management.sh
+```
 
-While Loops
+Once running, you'll see the interactive menu and can select an option by number.
 
-Logging
+---
 
-Features
-Create User
-Creates a new Linux user account and home directory.
+## 🧩 Features & Command Reference
 
-Command Used:
+Each feature maps to a standard Linux administration command. The **"why"** is included for each so the behavior is clear, not just the syntax.
 
-useradd -m username
-Explanation:
+### Create User
 
-useradd creates a user account
+Creates a new Linux user account along with its home directory.
 
--m creates the user's home directory
-
-Example:
-
+```bash
 useradd -m john
-Delete User
-Deletes a user account and removes its home directory.
+```
 
-Command Used:
+| Flag | Meaning |
+|------|---------|
+| `useradd` | Creates a new user account |
+| `-m` | Also creates the user's home directory |
 
-userdel -r username
-Explanation:
+### Delete User
 
-userdel removes the user account
+Removes a user account and its home directory.
 
--r removes the home directory
-
-Example:
-
+```bash
 userdel -r john
-Check User
-Checks whether a user exists on the system.
+```
 
-Command Used:
+| Flag | Meaning |
+|------|---------|
+| `userdel` | Removes the user account |
+| `-r` | Also removes the home directory and mail spool |
 
-id username
-Example:
+### Check User
 
+Verifies whether a user exists on the system.
+
+```bash
 id john
+```
+
 Output:
 
+```
 uid=1001(john) gid=1001(john) groups=1001(john)
-Lock User Account
-Temporarily disables a user account.
+```
 
-Command Used:
+### Lock User Account
 
-passwd -l username
-Example:
+Temporarily disables an account by locking its password.
 
+```bash
 passwd -l john
-Unlock User Account
-Re-enables a previously locked user account.
+```
 
-Command Used:
+### Unlock User Account
 
-passwd -u username
-Example:
+Re-enables a previously locked account.
 
+```bash
 passwd -u john
-Reset Password
-Allows an administrator to assign a new password.
+```
 
-Command Used:
+### Reset Password
 
-passwd username
-Example:
+Assigns a new password to an existing user.
 
+```bash
 passwd john
-View User Information
-Displays user details.
+```
 
-Command Used:
+### View User Information
 
-id username
-Example Output:
+Displays the user's UID, GID, and group memberships.
 
-uid=1001(john)
-gid=1001(john)
-groups=1001(john)
-Action Logging
-All administrative actions are recorded in:
+```bash
+id john
+```
 
-user_management.log
-Example:
+---
 
+## 📝 Action Logging
+
+Every administrative action is appended to an audit log so changes can be traced after the fact.
+
+**Log file:** `user_management.log`
+
+Example contents:
+
+```
 Thu Jun 05 10:15:33 UTC 2026 - User created: john
 Thu Jun 05 10:18:21 UTC 2026 - Password reset for: john
 Thu Jun 05 10:20:10 UTC 2026 - User locked: john
-Script Structure
-Variables
+```
+
+---
+
+## 🏗️ Script Structure
+
+### Variable
+
+```bash
 LOG_FILE="user_management.log"
-Stores all administrative actions.
+```
 
-Functions
-The script uses reusable Bash functions:
+Stores the path of the audit log used by every function.
 
-create_user()
-delete_user()
-check_user()
-lock_user()
-unlock_user()
-reset_password()
+### Functions
+
+The script is organized into reusable functions, one per task:
+
+```
+create_user()       delete_user()      check_user()
+lock_user()         unlock_user()      reset_password()
 view_user_info()
-Conditional Logic
-Used to verify whether users exist before performing actions.
+```
 
+### Conditional Logic
+
+Before acting, the script confirms the user exists (or doesn't, for creation):
+
+```bash
 if id "$USERNAME" &>/dev/null
 then
     echo "User exists."
 else
     echo "User does not exist."
 fi
-Menu System
-The script uses:
+```
 
-while true
-and
+> `&>/dev/null` discards both stdout and stderr so only the exit status is used for the check — keeping the menu output clean.
 
-case
-to create an interactive administration menu.
+### Menu Loop
 
-Sample Menu
+A `while true` loop combined with a `case` statement creates the interactive menu and keeps it running until the user chooses to exit.
+
+---
+
+## 🖥️ Sample Menu
+
+```
 =================================
       USER MANAGEMENT TOOL
 =================================
@@ -177,67 +202,220 @@ Sample Menu
 6. Reset Password
 7. View User Information
 8. Exit
-Skills Demonstrated
-Linux User Administration
+```
 
-Bash Scripting
+---
 
-Functions
+## 🎯 Skills Demonstrated
 
-Variables
+- Linux user administration
+- Bash scripting
+- Functions and code reuse
+- Variables
+- Conditional logic (`if` / `else`)
+- `case` statements
+- Loops (`while`)
+- Logging and auditing
+- Error handling and input validation
+- Menu-driven script design
 
-Conditional Logic
+---
 
-Case Statements
+## 📚 Lessons Learned / Gotchas
 
-Loops
+A few things this project reinforced — documented here as honest learning moments:
 
-Logging
+- **Root is mandatory.** The first runs failed silently until I realized `useradd`, `userdel`, and `passwd` all need elevated privileges. A future version should check for root at startup (`if [[ $EUID -ne 0 ]]`) and exit early with a clear message.
+- **Validate before you act.** Wrapping every action in an `id "$USERNAME"` check prevents confusing errors like trying to delete a user that doesn't exist.
+- **Logging is cheap insurance.** Appending a timestamped line for every action turns the script into an auditable tool rather than a black box.
+- **`&>/dev/null` matters.** Suppressing command output during existence checks keeps the menu readable instead of dumping raw command output between prompts.
 
-Error Handling
+---
 
-System Administration
+## 🔮 Future Enhancements (v2 Ideas)
 
-Learning Outcomes
-This project helped practice:
+- Root-privilege check at startup
+- List all local users
+- Group management (create / delete groups)
+- Add user to / remove user from a group
+- Password expiration checks
+- Export reports (CSV / text)
+- Email notifications on account changes
+- Account activity reporting
 
-Linux account management
+---
 
-Automation of repetitive administrative tasks
+## 📜 Full Script
 
-Bash scripting best practices
+```bash
+#!/bin/bash
 
-Menu-driven script design
+LOG_FILE="user_management.log"
 
-User validation
+create_user() {
 
-Action auditing through log files
+    read -p "Enter username: " USERNAME
 
-Future Enhancements
-Version 2 Ideas:
+    if id "$USERNAME" &>/dev/null
+    then
+        echo "User already exists."
+    else
+        useradd -m "$USERNAME"
 
-List all local users
+        echo "$(date) - User created: $USERNAME" >> "$LOG_FILE"
 
-Group management
+        echo "User $USERNAME created successfully."
+    fi
 
-Add user to group
+}
 
-Remove user from group
+delete_user() {
 
-Password expiration checks
+    read -p "Enter username to delete: " USERNAME
 
-Export reports
+    if id "$USERNAME" &>/dev/null
+    then
+        userdel -r "$USERNAME"
 
-Email notifications
+        echo "$(date) - User deleted: $USERNAME" >> "$LOG_FILE"
 
-Account activity reporting
+        echo "User $USERNAME deleted successfully."
+    else
+        echo "User does not exist."
+    fi
 
-Author
-Syed Basit Aftab
+}
+
+check_user() {
+
+    read -p "Enter username to check: " USERNAME
+
+    if id "$USERNAME" &>/dev/null
+    then
+        echo "User exists."
+    else
+        echo "User does not exist."
+    fi
+
+}
+
+lock_user() {
+
+    read -p "Enter username to lock: " USERNAME
+
+    if id "$USERNAME" &>/dev/null
+    then
+        passwd -l "$USERNAME"
+
+        echo "$(date) - User locked: $USERNAME" >> "$LOG_FILE"
+
+        echo "User $USERNAME has been locked."
+    else
+        echo "User does not exist."
+    fi
+
+}
+
+unlock_user() {
+
+    read -p "Enter username to unlock: " USERNAME
+
+    if id "$USERNAME" &>/dev/null
+    then
+        passwd -u "$USERNAME"
+
+        echo "$(date) - User unlocked: $USERNAME" >> "$LOG_FILE"
+
+        echo "User $USERNAME has been unlocked."
+    else
+        echo "User does not exist."
+    fi
+
+}
+
+reset_password() {
+
+    read -p "Enter username: " USERNAME
+
+    if id "$USERNAME" &>/dev/null
+    then
+        passwd "$USERNAME"
+
+        echo "$(date) - Password reset for: $USERNAME" >> "$LOG_FILE"
+
+        echo "Password updated successfully."
+    else
+        echo "User does not exist."
+    fi
+
+}
+
+view_user_info() {
+
+    read -p "Enter username: " USERNAME
+
+    if id "$USERNAME" &>/dev/null
+    then
+        echo "User Information:"
+        id "$USERNAME"
+
+        echo "$(date) - Viewed user info: $USERNAME" >> "$LOG_FILE"
+    else
+        echo "User does not exist."
+    fi
+
+}
+
+while true
+do
+
+    echo
+    echo "================================="
+    echo "      USER MANAGEMENT TOOL"
+    echo "================================="
+    echo "1. Create User"
+    echo "2. Delete User"
+    echo "3. Check User"
+    echo "4. Lock User"
+    echo "5. Unlock User"
+    echo "6. Reset Password"
+    echo "7. View User Information"
+    echo "8. Exit"
+    echo
+
+    read -p "Enter your choice: " CHOICE
+
+    case $CHOICE in
+
+        1) create_user ;;
+        2) delete_user ;;
+        3) check_user ;;
+        4) lock_user ;;
+        5) unlock_user ;;
+        6) reset_password ;;
+        7) view_user_info ;;
+
+        8)
+            echo "Exiting User Management Tool..."
+            break
+            ;;
+
+        *)
+            echo "Invalid option. Please try again."
+            ;;
+
+    esac
+
+done
+```
+
+---
+
+## 👤 Author
+
+**Syed Basit Aftab**
 
 Linux • DevOps • AWS Learning Journey
 
-
-
-
-
+- GitHub: [@saftab4-arch](https://github.com/saftab4-arch)
+- LinkedIn: [syed-b-9078141a8](https://www.linkedin.com/in/syed-b-9078141a8/)
