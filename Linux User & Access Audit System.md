@@ -1,4 +1,35 @@
-Project 02 – User & Access Audit System
+# Linux User & Access Audit System
+
+
+
+## Overview
+
+A Linux administration and security auditing script that collects and reports user access information from a Linux server. This project simulates a common cloud operations task where administrators must review user accounts, group memberships, administrative privileges, and access controls during security audits, compliance reviews, or incident investigations.
+
+The script generates a structured audit report containing:
+
+- All system user accounts
+- Linux group memberships
+- Sudo (administrative) access information
+- User privilege details (UID/GID)
+- Login audit status
+- System metadata (hostname, timestamp)
+
+---
+
+## Project Structure
+
+```
+user-access-audit/
+├── user_access_audit.sh       # Main audit script
+└── user_access_report.txt     # Generated audit report (auto-created on run)
+```
+
+---
+
+## The Script
+
+```bash
 #!/bin/bash
 
 REPORT="user_access_report.txt"
@@ -30,275 +61,238 @@ echo "=== LOGIN AUDIT ===" >> "$REPORT"
 
 if command -v lastlog >/dev/null 2>&1
 then
-    lastlog >> "$REPORT"
+  lastlog >> "$REPORT"
 else
-    echo "lastlog utility not installed in container." >> "$REPORT"
+  echo "lastlog utility not installed in container." >> "$REPORT"
 fi
 
 echo "" >> "$REPORT"
 echo "=== AUDIT COMPLETE ===" >> "$REPORT"
 
 echo "Report created: $REPORT"
+```
 
+---
 
+## Usage
 
+```bash
+# Grant execute permissions
+chmod +x user_access_audit.sh
 
-Overview
-The User & Access Audit System is a Linux administration and security auditing project designed to collect and report user access information from a Linux server.
+# Run the audit
+./user_access_audit.sh
 
-This project simulates a common cloud operations task where administrators must review user accounts, group memberships, administrative privileges, and access controls during security audits, compliance reviews, or incident investigations.
+# View the generated report
+cat user_access_report.txt
+```
 
-The script generates an audit report containing:
+---
 
-System users
+## Commands Explained
 
-Linux groups
+### List All Users
 
-Sudo access information
-
-User privilege details
-
-Login audit status
-
-System metadata
-
-Objectives
-Learn Linux user management concepts
-
-Understand Linux groups and permissions
-
-Identify administrative users
-
-Generate access audit reports
-
-Practice Bash scripting
-
-Simulate real-world cloud operations tasks
-
-Technologies Used
-Linux
-
-Ubuntu Container
-
-Docker
-
-Bash
-
-User Management Commands
-
-Linux Permission Model
-
-Project Structure
-user-access-audit/
-│
-├── user_access_audit.sh
-└── user_access_report.txt
-Commands Used During Investigation
-List All Users
+```bash
 cut -d: -f1 /etc/passwd
-Command Breakdown
-Option	Meaning
-cut	Extract specific fields from text
--d:	Use ":" as delimiter
--f1	Display field 1
-/etc/passwd	Linux user database
-Example
-Input:
+```
 
+| Option | Meaning |
+|--------|---------|
+| `cut` | Extract specific fields from text |
+| `-d:` | Use `:` as the field delimiter |
+| `-f1` | Display only field 1 (the username) |
+| `/etc/passwd` | Linux user database |
+
+**Example — Input:**
+```
 ubuntu:x:1000:1000:Ubuntu User:/home/ubuntu:/bin/bash
-Output:
-
+```
+**Output:**
+```
 ubuntu
-Purpose
-Displays all user accounts configured on the system.
+```
 
-List All Groups
+---
+
+### List All Groups
+
+```bash
 cut -d: -f1 /etc/group
-Purpose
-Displays all configured Linux groups.
+```
 
-Identify Sudo Users
+Displays all configured Linux groups from `/etc/group`.
+
+---
+
+### Identify Sudo Users
+
+```bash
 grep sudo /etc/group
-Example Output
+```
+
+**Example output:**
+```
 sudo:x:27:ubuntu
-Breakdown
-Field	Meaning
-sudo	Group Name
-x	Password Placeholder
-27	Group ID (GID)
-ubuntu	Group Members
-Purpose
-Identifies users with administrative privileges.
+```
 
-Inspect User Permissions
+| Field | Meaning |
+|-------|---------|
+| `sudo` | Group name |
+| `x` | Password placeholder |
+| `27` | Group ID (GID) |
+| `ubuntu` | Group members |
+
+Identifies which users have been granted administrative (root-level) privileges.
+
+---
+
+### Inspect User Permissions
+
+```bash
 id ubuntu
-Example Output
+```
+
+**Example output:**
+```
 uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),27(sudo)
-Purpose
-Displays:
+```
 
-User ID (UID)
+Shows:
+- **UID** — User ID (how Linux internally tracks users)
+- **Primary GID** — The user's default group
+- **Supplementary groups** — All additional groups the user belongs to (including `sudo`)
 
-Primary Group (GID)
+---
 
-Additional Group Memberships
+## Understanding UID and GID
 
-Used to verify effective permissions.
+Linux tracks users and groups by numeric identifiers, not names.
 
-Understanding UID and GID
-UID
-User Identifier
+| Identifier | Example | Description |
+|------------|---------|-------------|
+| UID | `uid=1000(ubuntu)` | Unique user identifier |
+| GID | `gid=1000(ubuntu)` | Primary group identifier |
 
-Example:
+Common system GIDs:
 
-uid=1000(ubuntu)
-Linux internally tracks users by UID rather than username.
+| Group | GID |
+|-------|-----|
+| root | 0 |
+| adm | 4 |
+| sudo | 27 |
+| video | 44 |
 
-GID
-Group Identifier
+---
 
-Example:
+## Troubleshooting: `lastlog` Not Found
 
-27(sudo)
-Linux tracks groups using GIDs.
+During testing inside an Ubuntu Docker container, `lastlog` was not available:
 
-Examples:
-
-Group	GID
-root	0
-adm	4
-sudo	27
-video	44
-Login Audit Investigation
-Attempted command:
-
-lastlog
-Result:
-
+```bash
+$ lastlog
 bash: lastlog: command not found
-Additional verification:
 
-which lastlog
-command -v lastlog
-Both commands returned no output.
+$ which lastlog
+(no output)
+```
 
-Finding
-The Ubuntu Docker container did not include the lastlog utility.
+**Root cause:** Minimal Docker images do not include all standard Linux auditing utilities.
 
-Real-World Note
-Production Linux servers and EC2 instances typically contain login auditing utilities such as:
+**Note for production:** Full Linux servers and EC2 instances typically include:
 
-lastlog
-last
-w
-who
-Minimal Docker images may not include these tools.
+| Tool | Purpose |
+|------|---------|
+| `lastlog` | Shows last login time per user |
+| `last` | Lists recent login sessions |
+| `w` | Shows who is currently logged in |
+| `who` | Lists active sessions |
 
-Generated Audit Report
-The script automatically collects:
+The script handles this gracefully with a `command -v` check and logs the missing tool rather than failing.
 
-Audit timestamp
+---
 
-Hostname
+## Sample Audit Report Output
 
-User accounts
-
-Linux groups
-
-Sudo group members
-
-User permission details
-
-Login audit status
-
-Example:
-
+```
 ==================================
 User & Access Audit Report
-Generated: Fri Jun 12
+Generated: Fri Jun 12 14:32:01 UTC 2026
 Hostname: container-host
 ==================================
-Security Findings
-User Review
-User account discovered:
 
+=== USERS ===
+root
+daemon
 ubuntu
-Administrative Access
-Verified through:
+...
 
-grep sudo /etc/group
-and
+=== GROUPS ===
+root
+sudo
+ubuntu
+...
 
-id ubuntu
-Finding:
+=== SUDO MEMBERS ===
+sudo:x:27:ubuntu
 
-ubuntu is a member of the sudo group.
-Login Audit
-Unable to verify login history because the container image does not include the lastlog utility.
+=== UBUNTU USER DETAILS ===
+uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),27(sudo)
 
-Risk Assessment
-No unexpected privileged users identified.
+=== LOGIN AUDIT ===
+lastlog utility not installed in container.
 
-Script Execution
-Grant execute permissions:
+=== AUDIT COMPLETE ===
+```
 
-chmod +x user_access_audit.sh
-Run:
+---
 
-./user_access_audit.sh
-View report:
+## Security Findings
 
-cat user_access_report.txt
-Real-World Cloud Operations Use Cases
+| Check | Finding |
+|-------|---------|
+| Unexpected users | None found |
+| Administrative access | `ubuntu` is a member of the `sudo` group — expected for this environment |
+| Login history | Unable to verify; `lastlog` not available in this container image |
+
+---
+
+## Real-World Use Cases
+
 This type of audit is commonly performed during:
 
-Security audits
+- Security audits and compliance reviews (SOC 2, CIS Benchmarks)
+- User access reviews (quarterly or post-incident)
+- New administrator onboarding
+- Incident response investigations
+- Server ownership transitions
+- Cloud environment assessments (AWS EC2, Azure VMs)
 
-Compliance reviews
+---
 
-User access reviews
+## Technologies Used
 
-New administrator onboarding
+| Technology | Purpose |
+|------------|---------|
+| Bash | Script language |
+| Linux / Ubuntu | Target OS |
+| Docker | Containerized test environment |
+| `/etc/passwd` | User account database |
+| `/etc/group` | Group membership database |
 
-Incident response investigations
+---
 
-Server ownership transitions
+## Key Takeaways
 
-Cloud environment assessments
+- Linux stores user data in `/etc/passwd` and group data in `/etc/group`
+- Users inherit permissions through group memberships, not just individual assignments
+- Administrative access is granted via the `sudo` group
+- Linux uses numeric UID/GID values internally — names are just labels
+- Minimal containers may lack standard OS auditing tools; scripts should handle this gracefully
+- Access auditing is a core responsibility for Cloud and DevOps engineers
 
-Skills Demonstrated
-Linux Administration
+---
 
-User Management
+## Skills Demonstrated
 
-Group Management
-
-Sudo Access Verification
-
-Security Auditing
-
-Bash Scripting
-
-Docker Administration
-
-System Documentation
-
-Troubleshooting
-
-Access Control Review
-
-Key Lessons Learned
-Linux stores user information in /etc/passwd
-
-Linux stores group information in /etc/group
-
-Users inherit permissions through groups
-
-Administrative access is typically granted through the sudo group
-
-UID and GID values are used internally by Linux
-
-Containers may not contain full operating system auditing utilities
-
-Access auditing is a critical responsibility for Cloud and DevOps engineers
-
+`Linux Administration` · `User Management` · `Group Management` · `Sudo Access Verification` · `Security Auditing` · `Bash Scripting` · `Docker` · `Troubleshooting` · `Access Control Review` · `System Documentation`
